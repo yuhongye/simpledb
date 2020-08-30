@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import junit.framework.Assert;
 import junit.framework.JUnit4TestAdapter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,11 +15,13 @@ import simpledb.TestUtil.SkeletonFile;
 import simpledb.systemtest.SimpleDbTestBase;
 import simpledb.systemtest.SystemTestUtil;
 
+@Slf4j
 public class CatalogTest extends SimpleDbTestBase {
     private static String name = "test";
 	private String nameThisTestRun;
     
-    @Before public void addTables() throws Exception {
+    @Before
+    public void addTables() throws Exception {
         Database.getCatalog().clear();
 		nameThisTestRun = SystemTestUtil.getUUID();
         Database.getCatalog().addTable(new SkeletonFile(-1, Utility.getTupleDesc(2)), nameThisTestRun);
@@ -28,8 +31,10 @@ public class CatalogTest extends SimpleDbTestBase {
     /**
      * Unit test for Catalog.getTupleDesc()
      */
-    @Test public void getTupleDesc() throws Exception {
+    @Test
+    public void getTupleDesc() throws Exception {
         TupleDesc expected = Utility.getTupleDesc(2);
+        log.info("expected tuple desc: {}", expected);
         TupleDesc actual = Database.getCatalog().getTupleDesc(-1);
 
         assertEquals(expected, actual);
