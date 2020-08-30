@@ -127,7 +127,7 @@ public class Catalog {
                     if (els2[1].trim().toLowerCase().equals("int"))
                         types.add(Type.INT_TYPE);
                     else if (els2[1].trim().toLowerCase().equals("string"))
-                        types.add(Type.STRING_TYPE);
+                        types.add(Type.FIXED_LENGTH_STRING_TYPE);
                     else {
                         System.out.println("Unknown type " + els2[1]);
                         System.exit(0);

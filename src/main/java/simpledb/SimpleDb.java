@@ -21,7 +21,7 @@ public class SimpleDb {
             if (s.toLowerCase().equals("int"))
                 ts.add(Type.INT_TYPE);
             else if (s.toLowerCase().equals("string"))
-                ts.add(Type.STRING_TYPE);
+                ts.add(Type.FIXED_LENGTH_STRING_TYPE);
             else {
                 System.out.println("Unknown type " + s);
                 return;

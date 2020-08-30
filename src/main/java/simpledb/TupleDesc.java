@@ -1,10 +1,17 @@
 package simpledb;
+import com.google.common.base.Preconditions;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * TupleDesc describes the schema of a tuple.
  */
+@Slf4j
 public class TupleDesc {
+    private List<FieldDesc> fields;
 
     /**
      * Merge two TupleDescs into one, with td1.numFields + td2.numFields
@@ -15,8 +22,10 @@ public class TupleDesc {
      * @return the new TupleDesc
      */
     public static TupleDesc combine(TupleDesc td1, TupleDesc td2) {
-        // some code goes here
-        return null;
+        List<FieldDesc> newFields = new ArrayList<>(td1.fields.size() + td2.fields.size());
+        newFields.addAll(td1.fields);
+        newFields.addAll(td2.fields);
+        return new TupleDesc(newFields);
     }
 
     /**
@@ -28,7 +37,15 @@ public class TupleDesc {
      * @param fieldAr array specifying the names of the fields. Note that names may be null.
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
-        // some code goes here
+        Preconditions.checkArgument(typeAr != null && Stream.of(typeAr).anyMatch(Objects::nonNull));
+        Preconditions.checkArgument(fieldAr == null || fieldAr.length == typeAr.length);
+
+        List<FieldDesc> fieldDescs = new ArrayList<>(typeAr.length);
+        for (int i = 0; i < typeAr.length; i++) {
+            fieldDescs.add(new FieldDesc(typeAr[i], fieldAr == null ? null : fieldAr[i]));
+        }
+        this.fields = fieldDescs;
+        log.debug("Construct tuple desc, fields desc: {}", fields);
     }
 
     /**
@@ -40,15 +57,18 @@ public class TupleDesc {
      *        this TupleDesc. It must contain at least one entry.
      */
     public TupleDesc(Type[] typeAr) {
-        // some code goes here
+        this(typeAr, null);
+    }
+
+    private TupleDesc(List<FieldDesc> fieldDescs) {
+        this.fields = fieldDescs;
     }
 
     /**
      * @return the number of fields in this TupleDesc
      */
     public int numFields() {
-        // some code goes here
-        return 0;
+        return fields.size();
     }
 
     /**
@@ -59,8 +79,10 @@ public class TupleDesc {
      * @throws NoSuchElementException if i is not a valid field reference.
      */
     public String getFieldName(int i) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        if (i >= fields.size()) {
+            throw new NoSuchElementException("Only has " + fields.size() + " fields, but get " + i);
+        }
+        return fields.get(i).name;
     }
 
     /**
@@ -69,10 +91,16 @@ public class TupleDesc {
      * @param name name of the field.
      * @return the index of the field that is first to have the given name.
      * @throws NoSuchElementException if no field with a matching name is found.
+     * @throws NullPointerException if name is null
      */
     public int nameToId(String name) throws NoSuchElementException {
-        // some code goes here
-        return 0;
+        Preconditions.checkNotNull(name);
+        for (int i = 0; i < fields.size(); i++) {
+            if (name.equals(fields.get(i).name)) {
+                return i;
+            }
+        }
+        throw new NoSuchElementException("Cannot found field of name: " + name);
     }
 
     /**
@@ -83,8 +111,10 @@ public class TupleDesc {
      * @throws NoSuchElementException if i is not a valid field reference.
      */
     public Type getType(int i) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        if (i >= fields.size()) {
+            throw new NoSuchElementException("Only has " + fields.size() + " fields, but get " + i);
+        }
+        return fields.get(i).type;
     }
 
     /**
@@ -92,8 +122,7 @@ public class TupleDesc {
      * Note that tuples from a given TupleDesc are of a fixed size.
      */
     public int getSize() {
-        // some code goes here
-        return 0;
+        return fields.stream().map(f -> f.type).mapToInt(Type::getLen).sum();
     }
 
     /**
@@ -104,11 +133,30 @@ public class TupleDesc {
      * @param o the Object to be compared for equality with this TupleDesc.
      * @return true if the object is equal to this TupleDesc.
      */
+    @Override
     public boolean equals(Object o) {
-        // some code goes here
-        return false;
+        if (this == o) {
+            return true;
+        }
+        if (! (o instanceof TupleDesc)) {
+            return false;
+        }
+
+        TupleDesc other = (TupleDesc) o;
+        if (this.fields.size() != other.fields.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < this.fields.size(); i++) {
+            if (getType(i) != other.getType(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
+    @Override
     public int hashCode() {
         // If you want to use TupleDesc as keys for HashMap, implement this so
         // that equal objects have equals hashCode() results
@@ -121,8 +169,20 @@ public class TupleDesc {
      * the exact format does not matter.
      * @return String describing this descriptor.
      */
+    @Override
     public String toString() {
-        // some code goes here
-        return "";
+        return fields.toString();
+    }
+
+    @AllArgsConstructor
+    private static class FieldDesc {
+        Type type;
+        // may be null, means the field with anonymous (unnamed)
+        String name;
+
+        @Override
+        public String toString() {
+            return type.toString() + "(" + (name == null ? "null" : name) + ")";
+        }
     }
 }

@@ -1,11 +1,21 @@
 package simpledb;
 
+import com.google.common.base.Preconditions;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Tuple maintains information about the contents of a tuple.
  * Tuples have a specified schema specified by a TupleDesc object and contain
  * Field objects with the data for each field.
  */
 public class Tuple {
+    private TupleDesc td;
+    private Field[] fields;
+
+    private RecordId recordId;
 
     /**
      * Create a new tuple with the specified schema (type).
@@ -14,15 +24,15 @@ public class Tuple {
      * instance with at least one field.
      */
     public Tuple(TupleDesc td) {
-        // some code goes here
+        this.td = Preconditions.checkNotNull(td);
+        fields = new Field[td.getSize()];
     }
 
     /**
      * @return The TupleDesc representing the schema of this tuple.
      */
     public TupleDesc getTupleDesc() {
-        // some code goes here
-        return null;
+        return td;
     }
 
     /**
@@ -30,8 +40,7 @@ public class Tuple {
      *   disk. May be null.
      */
     public RecordId getRecordId() {
-        // some code goes here
-        return null;
+        return recordId;
     }
 
     /**
@@ -39,7 +48,7 @@ public class Tuple {
      * @param rid the new RecordId for this tuple.
      */
     public void setRecordId(RecordId rid) {
-        // some code goes here
+        this.recordId = rid;
     }
 
     /**
@@ -49,7 +58,8 @@ public class Tuple {
      * @param f new value for the field.
      */
     public void setField(int i, Field f) {
-        // some code goes here
+        Preconditions.checkArgument(i < fields.length);
+        fields[i] = f;
     }
 
     /**
@@ -58,8 +68,7 @@ public class Tuple {
      * @param i field index to return. Must be a valid index.
      */
     public Field getField(int i) {
-        // some code goes here
-        return null;
+        return fields[i];
     }
 
     /**
@@ -72,7 +81,6 @@ public class Tuple {
      * where \t is any whitespace, except newline, and \n is a newline
      */
     public String toString() {
-        // some code goes here
-        throw new UnsupportedOperationException("Implement this");
+        return Stream.of(fields).map(Objects::toString).collect(Collectors.joining("\t"));
     }
 }

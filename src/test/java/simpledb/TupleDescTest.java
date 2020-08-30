@@ -2,27 +2,34 @@ package simpledb;
 
 import java.util.NoSuchElementException;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 
 import simpledb.systemtest.SimpleDbTestBase;
 
-import static org.junit.Assert.*;
-import junit.framework.Assert;
 import junit.framework.JUnit4TestAdapter;
 
+import static org.junit.Assert.*;
+
+@Slf4j
 public class TupleDescTest extends SimpleDbTestBase {
 
     /**
      * Unit test for TupleDesc.combine()
      */
-    @Test public void combine() {
+    @Test
+    public void combine() {
         TupleDesc td1, td2, td3;
 
         td1 = Utility.getTupleDesc(1, "td1");
         td2 = Utility.getTupleDesc(2, "td2");
+        log.info("td1: {}", td1);
+        log.info("td2: {}", td2);
 
         // test td1.combine(td2)
         td3 = TupleDesc.combine(td1, td2);
+        log.info("td3: {}", td3);
         assertEquals(3 , td3.numFields());
         assertEquals(3 * Type.INT_TYPE.getLen(), td3.getSize());
         for (int i = 0; i < 3; ++i)
@@ -70,7 +77,8 @@ public class TupleDescTest extends SimpleDbTestBase {
     /**
      * Unit test for TupleDesc.getType()
      */
-    @Test public void getType() {
+    @Test
+    public void getType() {
         int[] lengths = new int[] { 1, 2, 1000 };
 
         for (int len: lengths) {
@@ -83,7 +91,8 @@ public class TupleDescTest extends SimpleDbTestBase {
     /**
      * Unit test for TupleDesc.nameToId()
      */
-    @Test public void nameToId() {
+    @Test
+    public void nameToId() {
         int[] lengths = new int[] { 1, 2, 1000 };
         String prefix = "test";
         
@@ -97,7 +106,7 @@ public class TupleDescTest extends SimpleDbTestBase {
             // Make sure you throw exception for non-existent fields
             try {
                 td.nameToId("foo");
-                Assert.fail("foo is not a valid field name");
+                org.junit.Assert.fail("foo is not a valid field name");
             } catch (NoSuchElementException e) {
                 // expected to get here
             }
@@ -106,7 +115,7 @@ public class TupleDescTest extends SimpleDbTestBase {
             try {
                 td.nameToId(null);
                 Assert.fail("null is not a valid field name");
-            } catch (NoSuchElementException e) {
+            } catch (NullPointerException e) {
                 // expected to get here
             }
 
@@ -148,7 +157,7 @@ public class TupleDescTest extends SimpleDbTestBase {
     @Test public void testEquals() {
         TupleDesc singleInt = new TupleDesc(new Type[]{Type.INT_TYPE});
         TupleDesc singleInt2 = new TupleDesc(new Type[]{Type.INT_TYPE});
-        TupleDesc intString = new TupleDesc(new Type[]{Type.INT_TYPE, Type.STRING_TYPE});
+        TupleDesc intString = new TupleDesc(new Type[]{Type.INT_TYPE, Type.FIXED_LENGTH_STRING_TYPE});
 
         // .equals() with null should return false
         assertFalse(singleInt.equals(null));

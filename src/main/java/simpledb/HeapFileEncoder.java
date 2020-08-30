@@ -139,7 +139,7 @@ public class HeapFileEncoder {
                     System.out.println ("BAD LINE : " + s);
                 }
             }
-            else   if (typeAr[fieldNo] == Type.STRING_TYPE) {
+            else   if (typeAr[fieldNo] == Type.FIXED_LENGTH_STRING_TYPE) {
                 s = s.trim();
                 int overflow = Type.STRING_LEN - s.length();
                 if (overflow < 0) {

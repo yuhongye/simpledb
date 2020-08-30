@@ -55,7 +55,7 @@ public class TestUtil {
         int i= 0;
         for (int j = 0; j < width; j++) {
             if (tupdata[j] instanceof String) {
-                types[j] = Type.STRING_TYPE;
+                types[j] = Type.FIXED_LENGTH_STRING_TYPE;
             }
             if (tupdata[j] instanceof Integer) {
                 types[j] = Type.INT_TYPE;
